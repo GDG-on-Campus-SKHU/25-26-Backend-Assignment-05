@@ -1,5 +1,6 @@
 package com.gdg.todolist.dto;
 
+import com.gdg.todolist.domain.User;
 import com.google.gson.annotations.SerializedName;
 import lombok.Builder;
 import lombok.Getter;
@@ -9,7 +10,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class UserInfoDto {
 
-    private String id;
+    private Long id;
     private String email;
 
     @SerializedName("verified_email")
@@ -29,7 +30,7 @@ public class UserInfoDto {
     private String locale;
 
     @Builder
-    public UserInfoDto(String id, String email, Boolean verifiedEmail, String name, String givenName, String familyName, String pictureUrl, String locale) {
+    public UserInfoDto(Long id, String email, Boolean verifiedEmail, String name, String givenName, String familyName, String pictureUrl, String locale) {
         this.id = id;
         this.email = email;
         this.verifiedEmail = verifiedEmail;
@@ -38,5 +39,13 @@ public class UserInfoDto {
         this.familyName = familyName;
         this.pictureUrl = pictureUrl;
         this.locale = locale;
+    }
+
+    public static UserInfoDto from(User user) {
+        return UserInfoDto.builder()
+                .id(user.getId())
+                .email(user.getEmail())
+                .name(user.getName())
+                .build();
     }
 }
