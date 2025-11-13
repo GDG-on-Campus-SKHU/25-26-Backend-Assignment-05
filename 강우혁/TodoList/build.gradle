@@ -6,7 +6,7 @@ plugins {
 
 group = 'com.gdg'
 version = '0.0.1-SNAPSHOT'
-description = 'OauthBoard'
+description = 'TodoList'
 
 java {
     toolchain {

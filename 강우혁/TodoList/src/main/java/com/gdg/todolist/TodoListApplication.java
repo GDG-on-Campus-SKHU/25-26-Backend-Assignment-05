@@ -1,13 +1,13 @@
-package com.gdg.oauthboard;
+package com.gdg.todolist;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
-public class OauthBoardApplication {
+public class TodoListApplication {
 
     public static void main(String[] args) {
-        SpringApplication.run(OauthBoardApplication.class, args);
+        SpringApplication.run(TodoListApplication.class, args);
     }
 
 }

@@ -1,10 +1,10 @@
-package com.gdg.oauthboard;
+package com.gdg.todolist;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
 @SpringBootTest
-class OauthBoardApplicationTests {
+class TodoListApplicationTests {
 
     @Test
     void contextLoads() {
