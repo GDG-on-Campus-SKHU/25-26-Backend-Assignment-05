@@ -9,11 +9,11 @@ import lombok.NoArgsConstructor;
 @Getter
 @NoArgsConstructor
 public class UserInfoDto {
-
+    @SerializedName("sub")
     private String id;
     private String email;
 
-    @SerializedName("verified_email")
+    @SerializedName("email_verified")
     private Boolean verifiedEmail;
 
     private String name;
