@@ -2,6 +2,7 @@ package com.gdg.todolist.dto;
 
 import com.gdg.todolist.domain.Provider;
 import com.gdg.todolist.domain.Role;
+import com.gdg.todolist.domain.User;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -28,15 +29,15 @@ public class LocalUserInfoDto {
         this.refreshToken = refreshToken;
     }
 
-    public static LocalUserInfoDto from(LocalUserInfoDto localUserInfoDto) {
+    public static LocalUserInfoDto from(User user) {
         return LocalUserInfoDto.builder()
-                .id(localUserInfoDto.getId())
-                .name(localUserInfoDto.getName())
-                .email(localUserInfoDto.getEmail())
-                .role(localUserInfoDto.getRole())
-                .provider(localUserInfoDto.getProvider())
-                .accessToken(localUserInfoDto.getAccessToken())
-                .refreshToken(localUserInfoDto.getRefreshToken())
+                .id(user.getId())
+                .name(user.getName())
+                .email(user.getEmail())
+                .role(user.getRole())
+                .provider(user.getProvider())
+                .accessToken(user.getAccessToken())
+                .refreshToken(user.getRefreshToken())
                 .build();
     }
 
