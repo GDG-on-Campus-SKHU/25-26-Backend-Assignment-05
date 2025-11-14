@@ -35,9 +35,9 @@ public class TokenProvider {
     private final Long accessTokenValidityTime;
     private final Long refreshTokenValidityTime;
 
-    public TokenProvider(@Value("jwt.secret") String secretKey,
-                         @Value("jwt.access-token-validity-in-milliseconds") Long accessTokenValidityTime,
-                         @Value("jwt.refresh-token-validity-in-milliseconds")  Long refreshTokenValidityTime) {
+    public TokenProvider(@Value("${jwt.secret}") String secretKey,
+                         @Value("${jwt.access-token-validity-in-milliseconds}") Long accessTokenValidityTime,
+                         @Value("${jwt.refresh-token-validity-in-milliseconds}")  Long refreshTokenValidityTime) {
         byte[] keyBytes = Decoders.BASE64.decode(secretKey);
         this.key = Keys.hmacShaKeyFor(keyBytes);
         this.accessTokenValidityTime = accessTokenValidityTime;
