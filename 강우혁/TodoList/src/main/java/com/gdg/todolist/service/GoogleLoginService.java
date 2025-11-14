@@ -111,7 +111,7 @@ public class GoogleLoginService {
         throw new UserNotFoundException("유저 정보를 가져오는데 실패했습니다.");
     }
 
-    public User test(Principal principal) {
+    public User googleLogin(Principal principal) {
         Long id = Long.parseLong(principal.getName());
 
         return userRepository.findById(id)
