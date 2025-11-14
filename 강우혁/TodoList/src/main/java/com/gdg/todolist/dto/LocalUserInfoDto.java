@@ -1,5 +1,6 @@
 package com.gdg.todolist.dto;
 
+import com.gdg.todolist.domain.LocalUser;
 import com.gdg.todolist.domain.Provider;
 import com.gdg.todolist.domain.Role;
 import com.gdg.todolist.domain.User;
@@ -29,7 +30,7 @@ public class LocalUserInfoDto {
         this.refreshToken = refreshToken;
     }
 
-    public static LocalUserInfoDto from(User user) {
+    public static LocalUserInfoDto from(LocalUser user) {
         return LocalUserInfoDto.builder()
                 .id(user.getId())
                 .name(user.getName())

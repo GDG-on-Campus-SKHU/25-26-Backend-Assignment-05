@@ -25,7 +25,6 @@ import org.springframework.web.client.RestTemplate;
 
 import java.net.URI;
 import java.security.Principal;
-import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
@@ -85,10 +84,7 @@ public class GoogleLoginService {
                         .build()
                 ));
 
-        return TokenDto.builder()
-                .accessToken(tokenProvider.createAccessToken(user))
-                .refreshToken(tokenProvider.createRefreshToken(user))
-                .build();
+        return tokenProvider.createToken(user);
     }
 
     private UserInfoDto getUserInfo(String accessToken) {

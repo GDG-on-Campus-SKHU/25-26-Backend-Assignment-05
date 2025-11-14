@@ -33,9 +33,6 @@ public class User {
     @Column(name = "USER_EMAIL", nullable = false)
     private String email;
 
-    @Column(name = "USER_PASSWORD")
-    private String password;
-
     @Column(name = "USER_PICTURE", nullable = false)
     private String pictureUrl;
 
@@ -57,7 +54,6 @@ public class User {
     public User(String name, String email, String password, String pictureUrl, Role role, Provider provider, String accessToken, String refreshToken) {
         this.name = name;
         this.email = email;
-        this.password = password;
         this.pictureUrl = pictureUrl;
         this.role = role;
         this.provider = provider;
@@ -70,12 +66,6 @@ public class User {
     }
     public void saveRefreshToken(String refreshToken) {
         this.refreshToken = refreshToken;
-    }
-
-    public void updateInfo(String name, String email, String password) {
-        this.name = name;
-        this.email = email;
-        this.password = password;
     }
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)

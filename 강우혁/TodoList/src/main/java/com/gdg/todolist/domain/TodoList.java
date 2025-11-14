@@ -1,14 +1,6 @@
 package com.gdg.todolist.domain;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.FetchType;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
@@ -36,13 +28,17 @@ public class TodoList {
     @JoinColumn(name = "user_id")
     private User user;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "local_user_id")
+    private LocalUser localUser;
+
     @Builder
-    public TodoList(Long id, String title, String description, Long status, User user) {
-        this.id = id;
+    public TodoList(String title, String description, Long status, User user, LocalUser localUser) {
         this.title = title;
         this.description = description;
         this.status = status;
         this.user = user;
+        this.localUser = localUser;
     }
 
     public void update(String title, String description, Long status, User user) {

@@ -39,6 +39,7 @@ public class SecurityConfig {
                                 "/api/**",
                                 "auth/**"
                                 ,"/", "/index.html"
+                                ,"/google/**"
                                 ,"/login/**", "oauth/**"
                                 ,"/error", "favicon.ico"
                                 ,"/static/**", "/assets/**"
