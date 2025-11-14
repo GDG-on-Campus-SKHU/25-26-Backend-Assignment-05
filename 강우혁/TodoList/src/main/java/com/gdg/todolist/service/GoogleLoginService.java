@@ -11,13 +11,15 @@ import com.gdg.todolist.jwt.TokenProvider;
 import com.gdg.todolist.repository.UserRepository;
 import com.google.gson.Gson;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
 import org.springframework.http.RequestEntity;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 
 import java.net.URI;
@@ -29,27 +31,28 @@ import java.util.Map;
 public class GoogleLoginService {
 
     private final String GOOGLE_TOKEN_URL = "https://oauth2.googleapis.com/token";
-    @Value("${jwt.google-client-id}")
-    private String GOOGLE_CLIENT_ID;
-    @Value("${jwt.google-client-pw}")
-    private String GOOGLE_CLIENT_PW;
-    private final String GOOGLE_REDIRECT_URI = "http://localhost:8080/api/callback/google";
+    private final String GOOGLE_CLIENT_ID = "41469615532-cl4cdv755332pobv0mp98d1ut03bd9v4.apps.googleusercontent.com";
+    private final String GOOGLE_CLIENT_PW = "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";
+    private final String GOOGLE_REDIRECT_URI = "http://localhost:8080/api/oauth2/callback/google";
 
     private final UserRepository userRepository;
     private final TokenProvider tokenProvider;
 
     public String getGoogleAccessToken(String code) {
         RestTemplate restTemplate = new RestTemplate();
-        Map<String, String> params = Map.of(
-                "code", code,
-                "scope", "https://www.googleapis.com/auth/userinfo.profile https://www.googleapis.com/auth/userinfo.email",
-                "client_id", GOOGLE_CLIENT_ID,
-                "client_secret", GOOGLE_CLIENT_PW,
-                "redirect_uri", GOOGLE_REDIRECT_URI,
-                "grant_type", "authorization_code"
-        );
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
 
-        ResponseEntity<String> responseEntity = restTemplate.postForEntity(GOOGLE_TOKEN_URL, params, String.class);
+        MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
+        params.add("code", code);
+        params.add("client_id", GOOGLE_CLIENT_ID);
+        params.add("client_secret", GOOGLE_CLIENT_PW);
+        params.add("redirect_uri", GOOGLE_REDIRECT_URI);
+        params.add("grant_type", "authorization_code");
+
+        HttpEntity<MultiValueMap<String, String>> request = new HttpEntity<>(params, headers);
+
+        ResponseEntity<String> responseEntity = restTemplate.postForEntity(GOOGLE_TOKEN_URL, request, String.class);
 
         if (responseEntity.getStatusCode().is2xxSuccessful()) {
             String json = responseEntity.getBody();
@@ -87,7 +90,7 @@ public class GoogleLoginService {
 
     private UserInfoDto getUserInfo(String accessToken) {
         RestTemplate restTemplate = new RestTemplate();
-        String url = "https://www.googleapis.com/oauth2/v2/userinfo?access_token=" + accessToken;
+        String url = "https://www.googleapis.com/oauth2/v3/userinfo";
 
         HttpHeaders headers = new HttpHeaders();
         headers.set("Authorization", "Bearer " + accessToken);
