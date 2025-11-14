@@ -28,10 +28,10 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class GoogleLoginService {
 
-    private final String GOOGLE_TOKEN_URL = "https://www.googleapis.com/token";
-    @Value("jwt.google-client-id")
+    private final String GOOGLE_TOKEN_URL = "https://oauth2.googleapis.com/token";
+    @Value("${jwt.google-client-id}")
     private String GOOGLE_CLIENT_ID;
-    @Value("jwt.google-client-pw")
+    @Value("${jwt.google-client-pw}")
     private String GOOGLE_CLIENT_PW;
     private final String GOOGLE_REDIRECT_URI = "http://localhost:8080/api/callback/google";
 
