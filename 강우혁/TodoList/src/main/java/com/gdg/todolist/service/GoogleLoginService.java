@@ -11,6 +11,7 @@ import com.gdg.todolist.jwt.TokenProvider;
 import com.gdg.todolist.repository.UserRepository;
 import com.google.gson.Gson;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
@@ -31,8 +32,10 @@ import java.util.Map;
 public class GoogleLoginService {
 
     private final String GOOGLE_TOKEN_URL = "https://oauth2.googleapis.com/token";
-    private final String GOOGLE_CLIENT_ID = "41469615532-cl4cdv755332pobv0mp98d1ut03bd9v4.apps.googleusercontent.com";
-    private final String GOOGLE_CLIENT_PW = "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";
+    @Value("${jwt.google-client-id}")
+    private String GOOGLE_CLIENT_ID;
+    @Value("${jwt.google-client-pw}")
+    private String GOOGLE_CLIENT_PW;
     private final String GOOGLE_REDIRECT_URI = "http://localhost:8080/api/oauth2/callback/google";
 
     private final UserRepository userRepository;
