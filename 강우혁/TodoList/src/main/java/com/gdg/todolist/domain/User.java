@@ -72,7 +72,14 @@ public class User {
         this.refreshToken = refreshToken;
     }
 
+    public void updateInfo(String name, String email, String password) {
+        this.name = name;
+        this.email = email;
+        this.password = password;
+    }
+
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     private List<TodoList> todos = new ArrayList<>();
+
 
 }
