@@ -1,4 +1,4 @@
-package org.example.oauth.controller;
+package org.example.oauth.controller.auth;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;

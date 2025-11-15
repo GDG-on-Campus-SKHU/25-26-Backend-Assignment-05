@@ -1,4 +1,4 @@
-package org.example.oauth.controller;
+package org.example.oauth.controller.auth;
 
 import lombok.RequiredArgsConstructor;
 import org.example.oauth.common.Constants;

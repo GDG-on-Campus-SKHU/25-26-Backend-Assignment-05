@@ -1,4 +1,4 @@
-package org.example.oauth.controller;
+package org.example.oauth.controller.post;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -6,7 +6,6 @@ import org.example.oauth.dto.post.request.PostCreateRequest;
 import org.example.oauth.dto.post.request.PostUpdateRequest;
 import org.example.oauth.dto.post.response.PostResponse;
 import org.example.oauth.service.post.PostService;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;

@@ -1,4 +1,4 @@
-package org.example.oauth.controller;
+package org.example.oauth.controller.auth;
 
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
