@@ -1,6 +1,9 @@
 package org.example.oauth.service;
 
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
+import org.example.oauth.common.Constants;
 import org.example.oauth.domain.user.Provider;
 import org.example.oauth.domain.user.Role;
 import org.example.oauth.domain.user.User;
@@ -11,10 +14,13 @@ import org.example.oauth.dto.user.response.UserResponse;
 import org.example.oauth.exception.BadRequestException;
 import org.example.oauth.exception.ErrorMessage;
 import org.example.oauth.jwt.TokenProvider;
+import org.example.oauth.repository.RefreshTokenRepository;
 import org.example.oauth.repository.UserRepository;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.Arrays;
 
 @Service
 @RequiredArgsConstructor
@@ -24,6 +30,7 @@ public class AuthService {
     private final PasswordEncoder passwordEncoder;
     private final TokenProvider tokenProvider;
     private final TokenService tokenService;
+    private final RefreshTokenRepository refreshTokenRepository;
 
     @Transactional
     public void signUp(SignUpRequest signUpRequest) {
@@ -60,5 +67,32 @@ public class AuthService {
                 .orElseThrow(() -> new BadRequestException(ErrorMessage.NOT_EXIST_USER));
 
         return UserResponse.userInfo(user);
+    }
+
+    @Transactional
+    public void logoutIfPresent(HttpServletRequest httpServletRequest) {
+        Cookie[] cookies = httpServletRequest.getCookies();
+
+        if (cookies == null) {
+            return;
+        }
+
+        String refreshToken = Arrays.stream(cookies)
+                .filter(cookie -> Constants.REFRESH_TOKEN.equals(cookie.getName()))
+                .findFirst()
+                .map(Cookie::getValue)
+                .orElse(null);
+
+        if (refreshToken == null) {
+            return;
+        }
+
+        if (!tokenProvider.validateToken(refreshToken)) {
+            return;
+        }
+
+        Long userId = tokenProvider.getUserIdFromToken(refreshToken);
+        refreshTokenRepository.findByUserId(userId)
+                .ifPresent(refreshTokenRepository::delete);
     }
 }

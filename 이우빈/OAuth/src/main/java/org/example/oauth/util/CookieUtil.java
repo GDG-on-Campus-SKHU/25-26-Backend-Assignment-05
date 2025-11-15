@@ -35,4 +35,11 @@ public final class CookieUtil {
         headers.add(HttpHeaders.SET_COOKIE, expireAt(PATH_FALLBACK));
         headers.add(HttpHeaders.SET_COOKIE, setRefreshCookie(newRefreshToken, maxAgeSec));
     }
+
+    public static String[] expireAllRefreshCookies() {
+        return new String[] {
+                expireAt(PATH_PRIMARY),
+                expireAt(PATH_FALLBACK)
+        };
+    }
 }

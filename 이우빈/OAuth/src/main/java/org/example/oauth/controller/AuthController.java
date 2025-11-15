@@ -1,5 +1,6 @@
 package org.example.oauth.controller;
 
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.example.oauth.common.Constants;
@@ -26,6 +27,8 @@ public class AuthController {
 
     private final AuthService authService;
 
+    private static final String HEADER_NAME = "Set-Cookie";
+
     @PostMapping("/signup")
     public ResponseEntity<Void> signUp(@Valid @RequestBody SignUpRequest signUpRequest) {
         authService.signUp(signUpRequest);
@@ -48,5 +51,14 @@ public class AuthController {
     public ResponseEntity<UserResponse> myInfo() {
         Long userId = UserValidator.requireLogin();
         return ResponseEntity.ok(authService.myInfo(userId));
+    }
+
+    @PostMapping("/logout")
+    public ResponseEntity<Void> logout(HttpServletRequest httpServletRequest) {
+        authService.logoutIfPresent(httpServletRequest);
+
+        return ResponseEntity.noContent()
+                .header(HEADER_NAME, CookieUtil.expireAllRefreshCookies())
+                .build();
     }
 }
