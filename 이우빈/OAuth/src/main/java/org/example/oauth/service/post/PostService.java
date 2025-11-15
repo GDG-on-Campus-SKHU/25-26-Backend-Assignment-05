@@ -7,6 +7,7 @@ import org.example.oauth.dto.post.request.PostCreateRequest;
 import org.example.oauth.dto.post.request.PostUpdateRequest;
 import org.example.oauth.dto.post.response.PostResponse;
 import org.example.oauth.exception.ErrorMessage;
+import org.example.oauth.exception.ForbiddenException;
 import org.example.oauth.exception.NotFoundException;
 import org.example.oauth.repository.CommentRepository;
 import org.example.oauth.repository.PostRepository;
@@ -64,7 +65,8 @@ public class PostService {
     public void deletePost(Long postId) {
         Post post = validateUser(postId);
 
-        commentRepository.findAll().stream()
+        commentRepository.findAll()
+                .stream()
                 .filter(comment -> comment.getPost().getId().equals(postId))
                 .forEach(commentRepository::delete);
 
@@ -78,7 +80,7 @@ public class PostService {
         boolean allowed = UserValidator.isAdmin() || post.getAuthor().getId().equals(userId);
 
         if (!allowed) {
-            throw new NotFoundException(ErrorMessage.NO_PERMISSION);
+            throw new ForbiddenException(ErrorMessage.NO_PERMISSION);
         }
 
         return post;
