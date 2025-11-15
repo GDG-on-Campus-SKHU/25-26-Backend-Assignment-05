@@ -35,14 +35,13 @@ public class AuthService {
 
     @Transactional
     public void signUp(SignUpRequest signUpRequest) {
-        userRepository.findByEmail(signUpRequest.getEmail())
-                .ifPresent(user -> {
-                    throw new BadRequestException(ErrorMessage.ALREADY_EXIST_EMAIL);
-                });
+        if (userRepository.findByEmail(signUpRequest.getEmail()).isPresent()) {
+            throw new BadRequestException(ErrorMessage.ALREADY_EXIST_EMAIL);
+        }
 
         userRepository.save(User.builder()
                 .email(signUpRequest.getEmail())
-                .password(signUpRequest.getPassword())
+                .password(passwordEncoder.encode(signUpRequest.getPassword()))
                 .name(signUpRequest.getName())
                 .role(Role.ROLE_USER)
                 .provider(Provider.LOCAL)
@@ -62,7 +61,7 @@ public class AuthService {
         return tokenService.saveAndReturnToken(user.getId(), user.getRole().name());
     }
 
-    @Transactional
+    @Transactional(readOnly = true)
     public UserResponse myInfo(Long userId) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new BadRequestException(ErrorMessage.NOT_EXIST_USER));
