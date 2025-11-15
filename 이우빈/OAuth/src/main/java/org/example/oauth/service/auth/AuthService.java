@@ -17,6 +17,7 @@ import org.example.oauth.exception.ErrorMessage;
 import org.example.oauth.jwt.TokenProvider;
 import org.example.oauth.repository.RefreshTokenRepository;
 import org.example.oauth.repository.UserRepository;
+import org.example.oauth.util.RequestToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -71,17 +72,7 @@ public class AuthService {
 
     @Transactional
     public void logout(HttpServletRequest httpServletRequest) {
-        Cookie[] cookies = httpServletRequest.getCookies();
-
-        if (cookies == null) {
-            return;
-        }
-
-        String refreshToken = Arrays.stream(cookies)
-                .filter(cookie -> Constants.REFRESH_TOKEN.equals(cookie.getName()))
-                .findFirst()
-                .map(Cookie::getValue)
-                .orElse(null);
+        String refreshToken = RequestToken.findRefresh(httpServletRequest, Constants.REFRESH_TOKEN);
 
         if (refreshToken == null) {
             return;
@@ -98,39 +89,6 @@ public class AuthService {
 
     @Transactional
     public TokenDto refresh(String refreshToken, long rotateBeforeTime) {
-        if (!tokenProvider.validateToken(refreshToken)) {
-            throw new BadRequestException(ErrorMessage.INVALID_TOKEN);
-        }
-
-        Long userId = tokenProvider.getUserIdFromToken(refreshToken);
-        RefreshToken stored = refreshTokenRepository.findByUserId(userId)
-                .orElseThrow(() -> new BadRequestException(ErrorMessage.INVALID_TOKEN));
-
-        if (!refreshToken.equals(stored.getToken())) {
-            throw new BadRequestException(ErrorMessage.INVALID_TOKEN);
-        }
-
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new BadRequestException(ErrorMessage.NOT_EXIST_USER));
-
-        String newAccessToken = tokenProvider.createAccessToken(user.getId(), user.getRole().name());
-
-        long expirationTime = tokenProvider.parseClaim(refreshToken).getExpiration().getTime();
-        long remainTime = expirationTime - System.currentTimeMillis();
-
-        if (remainTime <= rotateBeforeTime) {
-            String newRefresh = tokenProvider.createRefreshToken(user.getId());
-            stored.updateRefreshToken(newRefresh);
-
-            return TokenDto.builder()
-                    .accessToken(newAccessToken)
-                    .refreshToken(newRefresh)
-                    .build();
-        } else {
-            return TokenDto.builder()
-                    .accessToken(newAccessToken)
-                    .refreshToken(null)
-                    .build();
-        }
+        return tokenService.validateAndRotate(refreshToken, rotateBeforeTime);
     }
 }
