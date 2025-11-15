@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="ko">
+<head>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width,initial-scale=1"/>
+    <link rel="stylesheet" href="/css/app.css">
+    <title>어드민</title>
+</head>
+<body>
+<h1>어드민</h1>
+<nav>
+    <a href="/index.html">홈</a> |
+    <a href="/mypage.html">내 정보</a> |
+    <button id="logout">로그아웃</button>
+</nav>
+
+<section>
+    <h3>상태</h3>
+    <div id="status">검사 중…</div>
+</section>
+
+<section>
+    <h3>관리자 전용 API</h3>
+    <button id="btn-ping">어드민만 눌러</button>
+</section>
+
+<h3>응답</h3>
+<pre id="out">Ready.</pre>
+
+<script src="/js/api.js"></script>
+<script>
+    (async () => {
+        const ok = await AppAPI.requireAuth({
+            redirectToLogin: true
+        });
+
+        if (!ok) return;
+
+        const who = await AppAPI.api('/auth/myInfo');
+        AppAPI.out(who);
+
+        const s = document.getElementById('status');
+        if (who.status === 200 && who.json && who.json.role) {
+            s.textContent = (who.json.role === 'ROLE_ADMIN') ? '관리자입니다.' : '관리자가 아닙니다.';
+        } else if (who.status === 401) {
+            s.textContent = '로그인이 필요합니다.';
+        } else if (who.status === 403) {
+            s.textContent = '관리자가 아닙니다.';
+        } else {
+            s.textContent = '인증 실패 또는 정보 확인 불가';
+        }
+
+        document.getElementById('btn-ping').onclick = async () => {
+            const r = await AppAPI.api('/admin/checkAdmin');
+            AppAPI.out(r);
+        };
+        document.getElementById('logout').onclick = AppAPI.logoutAndGoHome;
+    })();
+</script>
+
+</body>
+</html>
