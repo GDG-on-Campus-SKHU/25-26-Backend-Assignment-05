@@ -5,35 +5,65 @@
     <meta name="viewport" content="width=device-width,initial-scale=1"/>
     <link rel="stylesheet" href="/css/app.css">
     <title>게시글</title>
+    <style>
+        .meta {
+            color: #666;
+            font-size: 13px;
+            margin-top: 4px
+        }
+
+        .comment {
+            border: 1px solid #eee;
+            border-radius: 10px;
+            padding: 10px;
+            margin: 10px 0
+        }
+
+        .comment .meta {
+            margin: 4px 0 8px
+        }
+
+        .comment-actions {
+            display: flex;
+            gap: 8px;
+            margin-top: 6px
+        }
+
+        .muted {
+            color: #888
+        }
+
+        .content {
+            white-space: pre-wrap
+        }
+    </style>
 </head>
 <body>
-<h1>게시글 상세</h1>
+<h1 id="title">게시글</h1>
+
 <nav>
     <a href="/index.html">홈</a> |
     <a href="/posts.html">목록</a> |
-    <a href="/login.html">로그인</a> |
-    <a href="/myPage.html">내 정보</a> |
+    <a href="/createPost.html">글쓰기</a> |
+    <a href="/myPage.html">내 정보</a>
     <button id="logout">로그아웃</button>
 </nav>
 
-<section id="post-area">
-    <h3 id="p-title">제목</h3>
-    <div id="p-meta" style="font-size:12px;color:#666">작성자</div>
-    <pre id="p-content">내용</pre>
+<section id="post">
+    <div class="meta" id="postMeta"></div>
+    <pre id="postBody" class="content">불러오는 중…</pre>
 </section>
 
-<section id="edit-area" style="display:none; margin-top:12px">
-    <label>제목
-        <input id="e-title" type="text" style="width:100%;max-width:720px">
-    </label><br>
-    <label>내용
-        <textarea id="e-content" rows="8" style="width:100%;max-width:720px"></textarea>
-    </label>
-</section>
+<section id="comments">
+    <h3>댓글</h3>
+    <div id="commentList">불러오는 중…</div>
 
-<section style="margin-top:8px">
-    <button id="edit">수정</button>
-    <button id="remove" style="margin-left:8px">삭제</button>
+    <div id="commentWrite" style="margin-top:12px;">
+        <h4>댓글 쓰기</h4>
+        <div id="commentGuard" class="muted">댓글을 작성하려면 로그인 해주세요.</div>
+        <textarea id="commentContent" rows="4" style="width:100%;max-width:720px"></textarea><br>
+        <button id="btnCommentCreate">등록</button>
+    </div>
 </section>
 
 <h3>응답</h3>
@@ -43,80 +73,26 @@
 <script>
     document.getElementById('logout').onclick = AppAPI.logoutAndGoHome;
 
-    const params = new URLSearchParams(location.search);
-    const postId = params.get('id');
+    const qs = new URLSearchParams(location.search);
+    const postId = Number(qs.get('id'));
     if (!postId) {
-        document.getElementById('post-area').innerHTML = '<div>잘못된 접근입니다.</div>';
+        alert('잘못된 접근입니다.');
+        location.href = '/posts.html';
     }
 
-    async function loadPost() {
-        const r = await AppAPI.api('/posts/' + postId);
-        if (r.status !== 200 || !r.json) {
-            AppAPI.out(r);
-            document.getElementById('post-area').innerHTML = '<div>글을 불러올 수 없습니다.</div>';
-            return;
-        }
-        const p = r.json;
-        document.getElementById('p-title').textContent = p.title || '';
-        document.getElementById('p-meta').textContent = `작성자: ${escapeHtml(p.authorName || '')}`;
-        document.getElementById('p-content').textContent = p.content || '';
-        document.getElementById('e-title').value = p.title || '';
-        document.getElementById('e-content').value = p.content || '';
+    let currentUser = {id: null, role: null};
+
+    function isAdmin() {
+        return currentUser.role === 'ROLE_ADMIN';
     }
 
-    let editing = false;
-    document.getElementById('edit').onclick = async () => {
-        const ok = await AppAPI.requireAuth({redirectToLogin: true});
-        if (!ok) return;
+    function escapeHtml(s) {
+        return s == null ? '' : s.replace(/[&<>"']/g, c => ({
+            '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+        })[c]);
+    }
 
-        if (!editing) {
-            editing = true;
-            document.getElementById('edit-area').style.display = 'block';
-            document.getElementById('edit').textContent = '수정';
-            return;
-        }
-
-        const title = document.getElementById('e-title').value.trim();
-        const content = document.getElementById('e-content').value.trim();
-        if (!title || !content) {
-            AppAPI.out({status: 400, text: '제목/내용을 입력하세요.'});
-            return;
-        }
-
-        const r = await AppAPI.api('/posts/' + postId, {
-            method: 'PATCH',
-            body: {title, content}
-        });
-
-        AppAPI.out(r);
-
-        const status = (r && typeof r.status === 'number') ? r.status : 0;
-        if (status >= 200 && status < 300) {
-            location.href = '/posts.html';
-            return;
-        }
-
-        if (!status && r && (r.ok === true || r.updated === true)) {
-            location.href = '/posts.html';
-        }
-    };
-
-    document.getElementById('remove').onclick = async () => {
-        const ok = await AppAPI.requireAuth({redirectToLogin: true});
-        if (!ok) {
-            return;
-        }
-        if (!confirm('이 글을 삭제할까요?')) {
-            return;
-        }
-
-        const r = await AppAPI.api('/posts/' + postId, {method: 'DELETE'});
-        AppAPI.out(r);
-        if (r.status === 204) location.href = '/posts.html';
-    };
-
-    (async () => {
-        await loadPost();
+    async function ensureAccessToken() {
         if (!AppAPI.getAccessToken()) {
             const r = await fetch('/auth/refresh', {method: 'POST', credentials: 'include'});
             if (r.ok) {
@@ -124,13 +100,156 @@
                 AppAPI.setAccessToken(j.accessToken || null);
             }
         }
-    })();
-
-    function escapeHtml(s) {
-        return s == null ? '' : s.replace(/[&<>"']/g, c => ({
-            '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
-        })[c]);
     }
+
+    async function loadMe() {
+        await ensureAccessToken();
+        if (!AppAPI.getAccessToken()) {
+            document.getElementById('commentGuard').style.display = '';
+            document.getElementById('commentContent').style.display = 'none';
+            document.getElementById('btnCommentCreate').style.display = 'none';
+            return;
+        }
+        const me = await AppAPI.api('/auth/myInfo');
+        if (me.status === 200 && me.json) {
+            currentUser.id = me.json.id;
+            currentUser.role = me.json.role;
+            document.getElementById('commentGuard').style.display = 'none';
+            document.getElementById('commentContent').style.display = '';
+            document.getElementById('btnCommentCreate').style.display = '';
+        }
+    }
+
+    async function loadPost() {
+        const r = await AppAPI.api(`/posts/${postId}`);
+        if (r.status !== 200 || !r.json) {
+            document.getElementById('postBody').textContent = '게시글을 불러오지 못했습니다.';
+            return;
+        }
+        const p = r.json;
+        document.getElementById('title').textContent = p.title;
+        document.getElementById('postMeta').textContent = `작성자: ${p.authorName ?? ''}`;
+        document.getElementById('postBody').textContent = p.content ?? '';
+    }
+
+    async function loadComments() {
+        const r = await AppAPI.api(`/posts/${postId}/comments`);
+        const listEl = document.getElementById('commentList');
+        if (r.status !== 200 || !Array.isArray(r.json)) {
+            listEl.textContent = '댓글을 불러오지 못했습니다.';
+            return;
+        }
+        if (r.json.length === 0) {
+            listEl.innerHTML = '<div class="muted">첫 댓글을 남겨보세요!</div>';
+            return;
+        }
+
+        const frag = document.createDocumentFragment();
+        r.json.forEach(c => {
+            const wrap = document.createElement('div');
+            wrap.className = 'comment';
+            wrap.id = `comment-${c.commentId}`;
+
+            const body = document.createElement('div');
+            body.className = 'content';
+            body.textContent = c.content ?? '';
+
+            const meta = document.createElement('div');
+            meta.className = 'meta';
+            meta.textContent = `작성자: ${escapeHtml(c.authorName ?? '')}`;
+
+            wrap.appendChild(meta);
+            wrap.appendChild(body);
+
+            const canEdit = currentUser.id && (isAdmin() || String(currentUser.id) === String(c.authorId));
+            if (canEdit) {
+                const actions = document.createElement('div');
+                actions.className = 'comment-actions';
+
+                const btnEdit = document.createElement('button');
+                btnEdit.textContent = '수정';
+                btnEdit.onclick = () => enterEditMode(wrap, c);
+
+                const btnDel = document.createElement('button');
+                btnDel.textContent = '삭제';
+                btnDel.onclick = () => deleteComment(c.commentId);
+
+                actions.append(btnEdit, btnDel);
+                wrap.appendChild(actions);
+            }
+
+            frag.appendChild(wrap);
+        });
+
+        listEl.innerHTML = '';
+        listEl.appendChild(frag);
+    }
+
+    function enterEditMode(container, c) {
+        const original = container.querySelector('.content');
+        const actions = container.querySelector('.comment-actions');
+
+        const ta = document.createElement('textarea');
+        ta.value = c.content || '';
+        ta.rows = 4;
+        ta.style.width = '100%';
+
+        const btnSave = document.createElement('button');
+        btnSave.textContent = '저장';
+        btnSave.onclick = async () => {
+            const content = ta.value.trim();
+            if (!content) return;
+            const r = await AppAPI.api(`/comments/${c.commentId}`, {
+                method: 'PATCH',
+                body: {content}
+            });
+            if (r.status === 200) {
+                await loadComments();
+            }
+        };
+
+        const btnCancel = document.createElement('button');
+        btnCancel.textContent = '취소';
+        btnCancel.onclick = () => loadComments();
+
+        original.replaceWith(ta);
+        if (actions) actions.replaceChildren(btnSave, btnCancel);
+    }
+
+    async function deleteComment(commentId) {
+        if (!confirm('댓글을 삭제하시겠습니까 ?')) return;
+        const r = await AppAPI.api(`/comments/${commentId}`, {method: 'DELETE'});
+        if (r.status === 204) {
+            await loadComments();
+        }
+    }
+
+    document.getElementById('btnCommentCreate').onclick = async () => {
+        const ok = await AppAPI.requireAuth({redirectToLogin: true});
+        if (!ok) {
+            return;
+        }
+        const content = document.getElementById('commentContent').value.trim();
+        if (!content) {
+            return;
+        }
+
+        const r = await AppAPI.api(`/posts/${postId}/comments`, {
+            method: 'POST',
+            body: {content}
+        });
+
+        if (r.status === 201) {
+            document.getElementById('commentContent').value = '';
+            await loadComments();
+        }
+    };
+
+    (async () => {
+        await loadMe();
+        await loadPost();
+        await loadComments();
+    })();
 </script>
 </body>
 </html>
