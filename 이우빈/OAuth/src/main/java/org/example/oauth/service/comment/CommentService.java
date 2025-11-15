@@ -8,6 +8,7 @@ import org.example.oauth.dto.comment.request.CommentCreateRequest;
 import org.example.oauth.dto.comment.request.CommentUpdateRequest;
 import org.example.oauth.dto.comment.response.CommentResponse;
 import org.example.oauth.exception.ErrorMessage;
+import org.example.oauth.exception.ForbiddenException;
 import org.example.oauth.exception.NotFoundException;
 import org.example.oauth.repository.CommentRepository;
 import org.example.oauth.repository.PostRepository;
@@ -71,7 +72,7 @@ public class CommentService {
         boolean allowed = UserValidator.isAdmin() || comment.getAuthor().getId().equals(userId);
 
         if (!allowed) {
-            throw new NotFoundException(ErrorMessage.NO_PERMISSION);
+            throw new ForbiddenException(ErrorMessage.NO_PERMISSION);
         }
 
         return comment;
