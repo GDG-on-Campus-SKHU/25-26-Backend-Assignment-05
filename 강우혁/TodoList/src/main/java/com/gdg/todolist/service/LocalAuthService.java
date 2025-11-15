@@ -35,7 +35,16 @@ public class LocalAuthService {
                 .build()
         );
 
-        return tokenProvider.localToken(localUser);
+        String accessToken = tokenProvider.createAccessToken(localUser);
+        String refreshToken = tokenProvider.createRefreshToken(localUser);
+
+        localUser.saveAccessToken(accessToken);
+        localUser.saveRefreshToken(refreshToken);
+
+        return TokenDto.builder()
+                .accessToken(accessToken)
+                .refreshToken(refreshToken)
+                .build();
     }
 
     @Transactional
@@ -49,7 +58,16 @@ public class LocalAuthService {
                 .build()
         );
 
-        return tokenProvider.localToken(localUser);
+        String accessToken = tokenProvider.createAccessToken(localUser);
+        String refreshToken = tokenProvider.createRefreshToken(localUser);
+
+        localUser.saveAccessToken(accessToken);
+        localUser.saveRefreshToken(refreshToken);
+
+        return TokenDto.builder()
+                .accessToken(accessToken)
+                .refreshToken(refreshToken)
+                .build();
     }
 
     @Transactional(readOnly = true)
@@ -64,6 +82,20 @@ public class LocalAuthService {
         LocalUser user = entityUserId(id);
 
         return LocalUserInfoDto.from(user);
+    }
+
+    @Transactional
+    public LocalUserInfoDto update(Long id, LocalUserSignUpDto localUserSignUpDto) {
+        LocalUser localUser = entityUserId(id);
+
+        localUser.updateInfo(
+                localUserSignUpDto.getName(),
+                localUserSignUpDto.getEmail(),
+                localUserSignUpDto.getPassword()
+        );
+
+        localUserRepository.save(localUser);
+        return LocalUserInfoDto.from(localUser);
     }
 
     @Transactional

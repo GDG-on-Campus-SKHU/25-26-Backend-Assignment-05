@@ -37,7 +37,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests(req -> req
                         .requestMatchers(
                                 "/api/**",
-                                "auth/**"
+                                "/auth/**"
                                 ,"/", "/index.html"
                                 ,"/google/**"
                                 ,"/login/**", "oauth/**"

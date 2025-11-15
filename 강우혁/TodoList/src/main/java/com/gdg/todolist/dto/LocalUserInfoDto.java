@@ -42,4 +42,8 @@ public class LocalUserInfoDto {
                 .build();
     }
 
+    public void updateInfo(LocalUserSignUpDto dto) {
+        this.name = dto.getName();
+        this.email = dto.getEmail();
+    }
 }

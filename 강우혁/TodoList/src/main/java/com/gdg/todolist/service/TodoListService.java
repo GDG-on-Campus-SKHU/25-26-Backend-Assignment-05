@@ -43,7 +43,7 @@ public class TodoListService {
     }
 
     @Transactional(readOnly = true)
-    public List<TodoListInfoResponseDto> getTodoLists(Long userId, String title) {
+    public List<TodoListInfoResponseDto> getTodoTitleLists(Long userId, String title) {
         User user = entityUserId(userId);
 
         List<TodoList> todoLists = todoListRepository.findByUser(user);

@@ -36,7 +36,7 @@ public class TokenProvider {
 
     public TokenProvider(@Value("${jwt.secret}") String secretKey,
                          @Value("${jwt.access-token-validity-in-milliseconds}") long accessTokenValidityTime,
-                         @Value("${jwt.refresh-token-validity-in-milliseconds") long refreshTokenValidityInMilliSeconds) {
+                         @Value("${jwt.refresh-token-validity-in-milliseconds}") long refreshTokenValidityInMilliSeconds) {
         byte[] keyBytes = Decoders.BASE64.decode(secretKey);
         this.key = Keys.hmacShaKeyFor(keyBytes);
         this.accessTokenValidityTime = accessTokenValidityTime;
@@ -69,31 +69,26 @@ public class TokenProvider {
                 .build();
     }
 
-    public TokenDto localToken(LocalUser localUser) {
-        long nowTime = (new Date()).getTime();
-
-        Date tokenExpiredTime = new Date(nowTime + accessTokenValidityTime);
-        Date refreshTokenExpiredTime = new Date(nowTime + refreshTokenValidityTime);
-
-        String accessToken = Jwts.builder()
-                .setSubject(localUser.getId().toString())
-                .claim("auth", localUser.getRole().name())
-                .setExpiration(tokenExpiredTime)
-                .signWith(key, SignatureAlgorithm.HS256)
-                .compact();
-
-        String refreshToken = Jwts.builder()
-                .setSubject(localUser.getId().toString())
-                .claim("auth", localUser.getRole().name())
-                .setExpiration(refreshTokenExpiredTime)
-                .signWith(key, SignatureAlgorithm.HS256)
-                .compact();
-
-        return TokenDto.builder()
-                .accessToken(accessToken)
-                .refreshToken(refreshToken)
-                .build();
+    public String createAccessToken(LocalUser user) {
+        return buildToken(user, accessTokenValidityTime);
     }
+
+    public String createRefreshToken(LocalUser user) {
+        return buildToken(user, refreshTokenValidityTime);
+    }
+
+    private String buildToken(LocalUser user, long validityTime) {
+        long now = new Date().getTime();
+        Date expiry = new Date(now + validityTime);
+
+        return Jwts.builder()
+                .setSubject(user.getId().toString())
+                .claim("auth", user.getRole().name())
+                .setExpiration(expiry)
+                .signWith(key, SignatureAlgorithm.HS256)
+                .compact();
+    }
+
 
     public Authentication getAuthentication(String accessToken) {
         Claims claims = parseClaims(accessToken);
