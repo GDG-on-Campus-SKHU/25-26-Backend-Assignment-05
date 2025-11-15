@@ -40,7 +40,7 @@
         const result = {status: res.status};
 
         Object.defineProperty(result, "headers", {
-            value: { get: (name) => res.headers.get(name) },
+            value: {get: (name) => res.headers.get(name)},
             enumerable: false
         });
 
@@ -111,7 +111,6 @@
     async function ensureAccessToken() {
         if (!accessToken) {
             const r = await fetch("/auth/refresh", {method: "POST", credentials: "include"});
-
             if (r.ok) {
                 const j = await r.json();
                 accessToken = j.accessToken || null;
@@ -190,7 +189,6 @@
     // myPage.html
     function initMyPage() {
         const btn = document.querySelector("#load");
-
         if (btn) {
             btn.onclick = async () => {
                 const r = await api("/auth/myInfo");
@@ -237,9 +235,10 @@
             const id = p.postId ?? p.id;
 
             div.innerHTML = `
-        <a href="/post.html?id=${encodeURIComponent(id)}"><b>${escapeHtml(p.title)}</b></a>
-        <div style="font-size:12px;color:#666">작성자: ${escapeHtml(p.authorName ?? "")}</div>
-      `;
+                <a href="/post.html?id=${encodeURIComponent(id)}"><b>${escapeHtml(p.title)}</b></a>
+                <div style="font-size:12px;color:#666">작성자: ${escapeHtml(p.authorName ?? "")}</div>
+            `;
+
             frag.appendChild(div);
         }
 
@@ -264,7 +263,36 @@
         }
 
         let currentUser = {id: null, role: null};
+        let currentPost = null;
+
         const isAdmin = () => currentUser.role === "ROLE_ADMIN";
+        const isOwner = () =>
+            currentUser.id && currentPost && String(currentUser.id) === String(currentPost.authorId);
+
+        (function ensurePostActionsContainer() {
+            if (!document.getElementById("postActions")) {
+                const host = document.querySelector("#post");
+                const actions = document.createElement("div");
+                actions.id = "postActions";
+                actions.style.display = "none";
+                actions.style.gap = "8px";
+                actions.style.marginTop = "10px";
+
+                const btnEdit = document.createElement("button");
+                btnEdit.id = "btnEdit";
+                btnEdit.textContent = "수정";
+
+                const btnDelete = document.createElement("button");
+                btnDelete.id = "btnDelete";
+                btnDelete.textContent = "삭제";
+
+                actions.append(btnEdit, btnDelete);
+
+                if (host) {
+                    host.appendChild(actions);
+                }
+            }
+        })();
 
         async function loadMe() {
             await ensureAccessToken();
@@ -289,6 +317,7 @@
                 return;
             }
             const me = await api("/auth/myInfo");
+
             if (me.status === 200 && me.json) {
                 currentUser.id = me.json.id;
                 currentUser.role = me.json.role;
@@ -312,25 +341,40 @@
             const bodyEl = document.getElementById("postBody");
 
             if (r.status !== 200 || !r.json) {
-                if (bodyEl) bodyEl.textContent = "게시글을 불러오지 못했습니다.";
+                if (bodyEl) {
+                    bodyEl.textContent = "게시글을 불러오지 못했습니다.";
+                }
+
                 return;
             }
 
-            const p = r.json;
+            currentPost = r.json;
             const title = document.getElementById("title");
             const meta = document.getElementById("postMeta");
 
             if (title) {
-                title.textContent = p.title;
+                title.textContent = currentPost.title;
             }
 
             if (meta) {
-                meta.textContent = `작성자: ${p.authorName ?? ""}`;
+                meta.textContent = `작성자: ${currentPost.authorName ?? ""}`;
             }
 
             if (bodyEl) {
-                bodyEl.textContent = p.content ?? "";
+                bodyEl.textContent = currentPost.content ?? "";
             }
+
+            renderPostActions();
+        }
+
+        function renderPostActions() {
+            const actions = document.getElementById("postActions");
+
+            if (!actions) {
+                return;
+            }
+
+            actions.style.display = (isAdmin() || isOwner()) ? "flex" : "none";
         }
 
         async function loadComments() {
@@ -345,14 +389,12 @@
                 listEl.textContent = "댓글을 불러오지 못했습니다.";
                 return;
             }
-
             if (r.json.length === 0) {
                 listEl.innerHTML = '<div class="muted">첫 댓글을 남겨보세요!</div>';
                 return;
             }
 
             const frag = document.createDocumentFragment();
-
             r.json.forEach((c) => {
                 const wrap = document.createElement("div");
                 wrap.className = "comment";
@@ -369,9 +411,7 @@
                 wrap.appendChild(meta);
                 wrap.appendChild(body);
 
-                const canEdit =
-                    currentUser.id && (isAdmin() || String(currentUser.id) === String(c.authorId));
-
+                const canEdit = currentUser.id && (isAdmin() || String(currentUser.id) === String(c.authorId));
                 if (canEdit) {
                     const actions = document.createElement("div");
                     actions.className = "comment-actions";
@@ -387,7 +427,6 @@
                     actions.append(btnEdit, btnDel);
                     wrap.appendChild(actions);
                 }
-
                 frag.appendChild(wrap);
             });
 
@@ -446,7 +485,6 @@
         }
 
         const createBtn = document.getElementById("btnCommentCreate");
-
         if (createBtn) {
             createBtn.onclick = async () => {
                 const ok = await requireAuth({redirectToLogin: true});
@@ -470,12 +508,100 @@
             };
         }
 
+        const btnEditPost = document.getElementById("btnEdit");
+        if (btnEditPost) {
+            btnEditPost.onclick = () => {
+                if (!currentPost) {
+                    return;
+                }
+
+                if (document.getElementById("editTitle")) {
+                    return;
+                }
+
+                const titleEl = document.getElementById("title");
+                const bodyEl = document.getElementById("postBody");
+                const actions = document.getElementById("postActions");
+
+                const editTitle = document.createElement("input");
+                editTitle.id = "editTitle";
+                editTitle.type = "text";
+                editTitle.style.width = "100%";
+                editTitle.value = currentPost.title || "";
+
+                if (titleEl) {
+                    titleEl.replaceWith(editTitle);
+                }
+
+                const editBody = document.createElement("textarea");
+                editBody.id = "editBody";
+                editBody.rows = 10;
+                editBody.style.width = "100%";
+                editBody.value = currentPost.content || "";
+
+                if (bodyEl) {
+                    bodyEl.replaceWith(editBody);
+                }
+
+                if (actions) {
+                    actions.replaceChildren();
+
+                    const btnSave = document.createElement("button");
+                    btnSave.textContent = "저장";
+                    btnSave.onclick = async () => {
+                        const title = editTitle.value.trim();
+                        const content = editBody.value.trim();
+
+                        if (!title || !content) {
+                            return;
+                        }
+
+                        const r = await api(`/posts/${postId}`, {
+                            method: "PATCH",
+                            body: {title, content}
+                        });
+
+                        if (r.status === 200) {
+                            location.href = `/post.html?id=${encodeURIComponent(postId)}`;
+                        } else {
+                            alert("수정에 실패했습니다.");
+                        }
+                    };
+
+                    const btnCancel = document.createElement("button");
+                    btnCancel.textContent = "취소";
+                    btnCancel.onclick = async () => {
+                        location.href = `/post.html?id=${encodeURIComponent(postId)}`;
+                    };
+
+                    actions.append(btnSave, btnCancel);
+                }
+            };
+        }
+
+        const btnDeletePost = document.getElementById("btnDelete");
+
+        if (btnDeletePost) {
+            btnDeletePost.onclick = async () => {
+                if (!confirm("이 글을 삭제하시겠습니까?")) {
+                    return;
+                }
+
+                const r = await api(`/posts/${postId}`, {method: "DELETE"});
+
+                if (r.status === 204) {
+                    location.href = "/posts.html";
+                } else {
+                    alert("삭제에 실패했습니다.");
+                }
+            };
+        }
+
         await loadMe();
         await loadPost();
         await loadComments();
     }
 
-    // createPost.html
     async function initCreatePost() {
         const ok = await requireAuth({redirectToLogin: true});
 

@@ -11,6 +11,7 @@ import java.util.List;
 @Builder
 public class PostResponse {
     private Long postId;
+    private Long authorId;
     private String authorName;
     private String title;
     private String content;
@@ -18,6 +19,7 @@ public class PostResponse {
     public static PostResponse postInfo(Post post, List<Comment> comments) {
         return PostResponse.builder()
                 .postId(post.getId())
+                .authorId(post.getAuthor().getId())
                 .authorName(post.getAuthor().getName())
                 .title(post.getTitle())
                 .content(post.getContent())
