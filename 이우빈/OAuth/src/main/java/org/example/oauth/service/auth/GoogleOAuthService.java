@@ -119,20 +119,18 @@ public class GoogleOAuthService {
     }
 
     private GoogleUserInfo fetchUserInfo(String accessToken) {
-        HttpHeaders httpHeaders = new HttpHeaders();
-        httpHeaders.setBearerAuth(accessToken);
+        URI uri = UriComponentsBuilder.fromUriString(USERINFO_URL).build(true).toUri();
 
-        URI uri = UriComponentsBuilder.fromUriString(USERINFO_URL)
-                .build(true)
-                .toUri();
+        RequestEntity<Void> requestEntity = RequestEntity
+                .get(uri)
+                .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken)
+                .build();
 
-        ResponseEntity<GoogleUserInfo> responseEntity
-                = restTemplate.exchange(new RequestEntity<Void>(httpHeaders, HttpMethod.GET, uri), GoogleUserInfo.class);
+        ResponseEntity<GoogleUserInfo> responseEntity = restTemplate.exchange(requestEntity, GoogleUserInfo.class);
 
         if (!responseEntity.getStatusCode().is2xxSuccessful() || responseEntity.getBody() == null) {
             throw new BadRequestException(ErrorMessage.OAUTH_PROFILE_FETCH_FAILED);
         }
-
         return responseEntity.getBody();
     }
 }
