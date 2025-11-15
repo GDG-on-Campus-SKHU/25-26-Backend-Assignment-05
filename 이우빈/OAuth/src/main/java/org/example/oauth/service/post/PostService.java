@@ -28,8 +28,7 @@ public class PostService {
     @Transactional
     public Long createPost(PostCreateRequest postCreateRequest) {
         Long userId = UserValidator.requireLogin();
-        User author = userRepository.findById(userId)
-                .orElseThrow(() -> new NotFoundException(ErrorMessage.NOT_EXIST_USER));
+        User author = userRepository.getReferenceById(userId);
 
         Post post = Post.builder()
                 .author(author)
