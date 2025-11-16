@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="ko">
+<head>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width,initial-scale=1"/>
+    <link rel="stylesheet" href="/css/app.css">
+    <title>게시글</title>
+</head>
+<body>
+<h1 id="title">게시글</h1>
+
+<nav>
+    <a href="/index.html">홈</a> |
+    <a href="/posts.html">목록</a> |
+    <a href="/createPost.html">글쓰기</a> |
+    <a href="/myPage.html">내 정보</a> |
+    <button id="logout">로그아웃</button>
+</nav>
+
+<section id="post">
+    <div class="meta" id="postMeta"></div>
+    <pre id="postBody" class="content">불러오는 중…</pre>
+
+    <div id="postActions" style="margin-top:10px; display:none; gap:8px;">
+        <button id="btnEdit">수정</button>
+        <button id="btnDelete">삭제</button>
+    </div>
+</section>
+
+<section id="comments">
+    <h3>댓글</h3>
+    <div id="commentList">불러오는 중…</div>
+
+    <div id="commentWrite" style="margin-top:12px;">
+        <h4>댓글 쓰기</h4>
+        <div id="commentGuard" class="muted">댓글을 작성하려면 로그인 해주세요.</div>
+        <textarea id="commentContent" rows="4" style="width:100%;max-width:720px"></textarea><br>
+        <button id="btnCommentCreate">등록</button>
+    </div>
+</section>
+
+<script src="/js/api.js"></script>
+</body>
+</html>

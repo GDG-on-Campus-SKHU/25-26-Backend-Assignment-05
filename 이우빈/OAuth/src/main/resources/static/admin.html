@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="ko">
+<head>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width,initial-scale=1"/>
+    <link rel="stylesheet" href="/css/app.css">
+    <title>어드민</title>
+</head>
+<body>
+<h1>어드민</h1>
+<nav>
+    <a href="/index.html">홈</a> |
+    <a href="/myPage.html">내 정보</a> |
+    <button id="logout">로그아웃</button>
+</nav>
+
+<section>
+    <h3>상태</h3>
+    <div id="status">검사 중…</div>
+</section>
+
+<section>
+    <h3>관리자 전용 API</h3>
+    <button id="btn-ping">어드민만 눌러</button>
+</section>
+
+<h3>응답</h3>
+<pre id="out">Ready.</pre>
+
+<script src="/js/api.js"></script>
+</body>
+</html>

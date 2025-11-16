@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="ko">
+<head>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width,initial-scale=1"/>
+    <link rel="stylesheet" href="/css/app.css">
+    <title>로그인</title>
+</head>
+<body>
+<h1>로그인</h1>
+<nav><a href="/index.html">홈</a></nav>
+
+<section>
+    <h3>로컬 로그인</h3>
+    <label>이메일 <input id="email" type="email"></label><br>
+    <label>비밀번호 <input id="pw" type="password"></label><br>
+    <button id="login">로그인</button>
+</section>
+
+<section>
+    <h3>소셜 로그인</h3>
+    <a href="/oauth2/authorize/google">Google로 로그인</a>
+</section>
+
+<h3>응답</h3>
+<pre id="out"></pre>
+
+<script src="/js/api.js"></script>
+</body>
+</html>
