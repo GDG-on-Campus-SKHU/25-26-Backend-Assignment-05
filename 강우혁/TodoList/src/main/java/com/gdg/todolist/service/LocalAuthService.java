@@ -32,6 +32,8 @@ public class LocalAuthService {
                 .password(passwordEncoder.encode(localSignupRequestDto.getPassword()))
                 .provider(Provider.LOCAL)
                 .role(Role.ROLE_ADMIN)
+                .providerId(null)
+                .pictureUrl(null)
                 .build()
         );
 
@@ -45,6 +47,8 @@ public class LocalAuthService {
                 .password(passwordEncoder.encode(localSignupRequestDto.getPassword()))
                 .provider(Provider.LOCAL)
                 .role(Role.ROLE_USER)
+                .providerId(null)
+                .pictureUrl(null)
                 .build()
         );
 
