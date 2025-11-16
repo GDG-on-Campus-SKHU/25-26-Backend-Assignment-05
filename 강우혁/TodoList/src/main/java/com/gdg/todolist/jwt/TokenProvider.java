@@ -62,6 +62,8 @@ public class TokenProvider {
                 .signWith(key, SignatureAlgorithm.HS256)
                 .compact();
 
+        user.saveToken(accessToken, refreshToken);
+
         return TokenDto.builder()
                 .accessToken(accessToken)
                 .refreshToken(refreshToken)
