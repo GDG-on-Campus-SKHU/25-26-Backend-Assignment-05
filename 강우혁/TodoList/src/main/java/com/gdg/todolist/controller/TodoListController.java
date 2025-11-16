@@ -26,40 +26,40 @@ public class TodoListController {
     private final TodoListService todoListService;
 
     @Operation(summary = "Todo 생성", description = "사용자의 Todo를 생성")
-    @PostMapping("/create/{id}")
+    @PostMapping("/create/{userId}")
     public ResponseEntity<TodoListInfoResponseDto> createTodo(
-            @PathVariable Long id,
+            @PathVariable Long userId,
             @RequestBody TodoListSaveRequestDto dto
     ) {
-        TodoListInfoResponseDto response = todoListService.createTodoList(dto, id);
+        TodoListInfoResponseDto response = todoListService.createTodoList(dto, userId);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
     @Operation(summary = "Todo 조회", description = "사용자의 Todo를 조회")
-    @GetMapping("/read/{id}")
-    public ResponseEntity<List<TodoListInfoResponseDto>> readTodo(@PathVariable Long id) {
-        return ResponseEntity.status(HttpStatus.OK).body(todoListService.getTodoLists(id));
+    @GetMapping("/read/{userId}")
+    public ResponseEntity<List<TodoListInfoResponseDto>> readTodo(@PathVariable Long userId) {
+        return ResponseEntity.status(HttpStatus.OK).body(todoListService.getTodoLists(userId));
     }
 
     @Operation(summary = "Todo 검색", description = "사용자의 Todo를 검색")
-    @GetMapping("/search/userid/{id}/title/{title}")
+    @GetMapping("/search/userid/{userId}/title/{title}")
     public ResponseEntity<List<TodoListInfoResponseDto>> search(
-            @PathVariable Long id,
+            @PathVariable Long userId,
             @PathVariable String title
     ){
-        return ResponseEntity.status(HttpStatus.OK).body(todoListService.getTodoTitleLists(id, title));
+        return ResponseEntity.status(HttpStatus.OK).body(todoListService.getTodoTitleLists(userId, title));
     }
 
     @Operation(summary = "Todo 수정", description = "사용자의 Todo를 수정")
-    @PatchMapping("/update/{id}")
-    public ResponseEntity<TodoListInfoResponseDto> updateTodo(@PathVariable Long id, @RequestBody TodoListSaveRequestDto dto) {
-        return ResponseEntity.status(HttpStatus.OK).body(todoListService.updateTodoList(id, dto));
+    @PatchMapping("/update/{todoId}")
+    public ResponseEntity<TodoListInfoResponseDto> updateTodo(@PathVariable Long todoId, @RequestBody TodoListSaveRequestDto dto) {
+        return ResponseEntity.status(HttpStatus.OK).body(todoListService.updateTodoList(todoId, dto));
     }
 
     @Operation(summary = "Todo 삭제", description = "사용자의 Todo를 삭제")
-    @DeleteMapping("/delete/{id}")
-    public ResponseEntity<TodoListInfoResponseDto> deleteTodo(@PathVariable Long id) {
-        todoListService.deleteTodoList(id);
+    @DeleteMapping("/delete/{todoId}")
+    public ResponseEntity<TodoListInfoResponseDto> deleteTodo(@PathVariable Long todoId) {
+        todoListService.deleteTodoList(todoId);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 }
