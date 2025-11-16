@@ -42,7 +42,7 @@ public class SecurityConfig {
                                 ,"/error", "favicon.ico"
                                 ,"/static/**", "/assets/**"
                         ).permitAll()
-                        .requestMatchers("/api/todo/**").authenticated()
+                        .requestMatchers("/todo/**").authenticated()
                         .anyRequest().authenticated()
                 )
                 .cors(cors -> cors.configurationSource(configurationSource()))
