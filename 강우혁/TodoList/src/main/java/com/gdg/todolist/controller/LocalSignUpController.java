@@ -55,8 +55,8 @@ public class LocalSignUpController {
 
     @Operation(summary = "회원정보 수정", description = "유저의 정보 수정")
     @PatchMapping("/update/{userId}")
-    public ResponseEntity<UserInfoResponseDto> updateUserInfo(@PathVariable Long userId, @RequestBody LocalSignupRequestDto localSignupRequestDto) {
-        return ResponseEntity.status(HttpStatus.OK).body(localAuthService.update(userId,localSignupRequestDto));
+    public ResponseEntity<UserInfoResponseDto> updateUserInfo(Principal principal, @RequestBody LocalSignupRequestDto localSignupRequestDto) {
+        return ResponseEntity.status(HttpStatus.OK).body(localAuthService.update(principal, localSignupRequestDto));
     }
 
     @Operation(summary = "회원 삭제", description = "유저 정보를 삭제")

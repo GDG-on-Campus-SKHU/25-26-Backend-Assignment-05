@@ -10,6 +10,7 @@ import com.gdg.todolist.exception.UserNotFoundException;
 import com.gdg.todolist.jwt.TokenProvider;
 import com.gdg.todolist.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -61,6 +62,7 @@ public class LocalAuthService {
         return UserInfoResponseDto.from(user);
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @Transactional(readOnly = true)
     public UserInfoResponseDto getUserInfo(Long id) {
         User user = findUser(id);
@@ -68,7 +70,21 @@ public class LocalAuthService {
     }
 
     @Transactional
-    public UserInfoResponseDto update(Long id, LocalSignupRequestDto localSignupRequestDto) {
+    public UserInfoResponseDto update(Principal principal, LocalSignupRequestDto localSignupRequestDto) {
+        User user = findUser(Long.parseLong(principal.getName()));
+
+        user.updateInfo(
+                localSignupRequestDto.getName() == null ? user.getName() : localSignupRequestDto.getName(),
+                localSignupRequestDto.getEmail() == null ? user.getEmail() : localSignupRequestDto.getEmail(),
+                localSignupRequestDto.getPassword() == null ? user.getPassword() : passwordEncoder.encode(localSignupRequestDto.getPassword())
+        );
+
+        return UserInfoResponseDto.from(user);
+    }
+
+    @PreAuthorize("hasRole('ADMIN')")
+    @Transactional
+    public UserInfoResponseDto adminUpdate(Long id, LocalSignupRequestDto localSignupRequestDto) {
         User user = findUser(id);
 
         user.updateInfo(
@@ -83,6 +99,12 @@ public class LocalAuthService {
     @Transactional
     public void deleteUser(Principal principal) {
         userRepository.deleteById(Long.parseLong(principal.getName()));
+    }
+
+    @PreAuthorize("hasRole('ADMIN')")
+    @Transactional
+    public void deleteUserById(Long id) {
+        userRepository.deleteById(id);
     }
 
     private User findUser(Long id) {
