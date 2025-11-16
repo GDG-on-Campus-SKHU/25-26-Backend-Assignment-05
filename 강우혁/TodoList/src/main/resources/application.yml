@@ -1,0 +1,27 @@
+spring:
+  datasource:
+    url: ${DB_URL}
+    username: ${DB_USER_NAME}
+    password: ${DB_PASSWORD}
+    driver-class-name: com.mysql.cj.jdbc.Driver
+  jpa:
+    database: mysql
+    database-platform: org.hibernate.dialect.MySQL8Dialect
+    hibernate:
+      ddl-auto: create
+    properties:
+      hibernate:
+        show-sql: true
+        format_sql: false
+        use_sql_comments: true
+
+jwt:
+  secret: ${JWT_SECRET}
+  access-token-validity-in-milliseconds: ${ACCESS_TOKEN_VALIDITY_IN_MILLISECONDS}
+  refresh-token-validity-in-milliseconds : ${REFRESH_TOKEN_VALIDITY_IN_MILLISECONDS}
+  google-client-id : ${GOOGLE_CLIENT_ID}
+  google-client-pw : ${GOOGLE_CLIENT_PW}
+
+springdoc:
+  swagger-ui:
+    path: /index.html
