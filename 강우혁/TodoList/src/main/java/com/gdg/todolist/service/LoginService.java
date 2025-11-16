@@ -1,7 +1,7 @@
 package com.gdg.todolist.service;
 
 import com.gdg.todolist.domain.LocalUser;
-import com.gdg.todolist.dto.LoginDto;
+import com.gdg.todolist.dto.LocalLoginRequestDto;
 import com.gdg.todolist.dto.TokenDto;
 import com.gdg.todolist.exception.UserNotFoundException;
 import com.gdg.todolist.jwt.TokenProvider;
@@ -20,7 +20,7 @@ public class LoginService {
     private final TokenProvider tokenProvider;
 
     @Transactional
-    public TokenDto login(LoginDto login) {
+    public TokenDto login(LocalLoginRequestDto login) {
         LocalUser localUser = localuserRepository.findByEmail(login.getEmail())
                 .orElseThrow(() -> new UserNotFoundException("사용자가 없습니다."));
         if (!passwordEncoder.matches(login.getPassword(), localUser.getPassword())) {

@@ -3,8 +3,7 @@ package com.gdg.todolist.dto;
 import lombok.Getter;
 
 @Getter
-public class LocalUserSignUpDto {
-    private String name;
+public class LocalLoginRequestDto {
     private String email;
     private String password;
 }

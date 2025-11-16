@@ -43,6 +43,7 @@ public class SecurityConfig {
                                 ,"/login/**", "oauth/**"
                                 ,"/error", "favicon.ico"
                                 ,"/static/**", "/assets/**"
+                                ,"todo/**"
                         ).permitAll()
                         .requestMatchers("/todo/**").authenticated()
                         .anyRequest().authenticated()

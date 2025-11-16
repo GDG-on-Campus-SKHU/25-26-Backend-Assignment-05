@@ -35,7 +35,7 @@ public class TodoListController {
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
-    @Operation(summary = "TodoList 조회", description = "사용자의 Todo를 조회합니다.")
+    @Operation(summary = "TodoList 조회", description = "사용자의 Todo를 조회c합니다.")
     @GetMapping("/read/{id}")
     public ResponseEntity<List<TodoListInfoResponseDto>> readTodo(@PathVariable Long id) {
         return ResponseEntity.status(HttpStatus.OK).body(todoListService.getTodoLists(id));

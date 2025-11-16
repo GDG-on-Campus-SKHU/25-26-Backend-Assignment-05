@@ -4,7 +4,7 @@ import com.gdg.todolist.domain.Provider;
 import com.gdg.todolist.domain.Role;
 import com.gdg.todolist.domain.User;
 import com.gdg.todolist.dto.TokenDto;
-import com.gdg.todolist.dto.UserInfoDto;
+import com.gdg.todolist.dto.GoogleUserInfoDto;
 import com.gdg.todolist.exception.BadReqeustException;
 import com.gdg.todolist.exception.UserNotFoundException;
 import com.gdg.todolist.jwt.TokenProvider;
@@ -68,17 +68,17 @@ public class GoogleLoginService {
     }
 
     public TokenDto loginOrSingUp(String getGoogleAccessToken) {
-        UserInfoDto userInfoDto = getUserInfo(getGoogleAccessToken);
+        GoogleUserInfoDto googleUserInfoDto = getUserInfo(getGoogleAccessToken);
 
-        if(!userInfoDto.getVerifiedEmail()){
+        if(!googleUserInfoDto.getVerifiedEmail()){
             throw new UserNotFoundException("유저 정보가 없습니다.");
         }
 
-        User user = userRepository.findByEmail(userInfoDto.getEmail())
+        User user = userRepository.findByEmail(googleUserInfoDto.getEmail())
                 .orElseGet(() -> userRepository.save(User.builder()
-                        .email(userInfoDto.getEmail())
-                        .name(userInfoDto.getName())
-                        .pictureUrl(userInfoDto.getPictureUrl())
+                        .email(googleUserInfoDto.getEmail())
+                        .name(googleUserInfoDto.getName())
+                        .pictureUrl(googleUserInfoDto.getPictureUrl())
                         .role(Role.ROLE_USER)
                         .provider(Provider.GOOGLE)
                         .build()
@@ -93,7 +93,7 @@ public class GoogleLoginService {
         return token;
     }
 
-    private UserInfoDto getUserInfo(String accessToken) {
+    private GoogleUserInfoDto getUserInfo(String accessToken) {
         RestTemplate restTemplate = new RestTemplate();
         String url = "https://www.googleapis.com/oauth2/v3/userinfo";
 
@@ -107,7 +107,7 @@ public class GoogleLoginService {
         if (responseEntity.getStatusCode().is2xxSuccessful()) {
             String json = responseEntity.getBody();
             Gson gson = new Gson();
-            return gson.fromJson(json, UserInfoDto.class);
+            return gson.fromJson(json, GoogleUserInfoDto.class);
         }
 
         throw new UserNotFoundException("유저 정보를 가져오는데 실패했습니다.");

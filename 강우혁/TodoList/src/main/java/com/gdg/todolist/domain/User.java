@@ -23,6 +23,7 @@ import java.util.List;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Table(name = "user")
 public class User {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -30,10 +31,13 @@ public class User {
     @Column(name = "USER_NAME", nullable = false)
     private String name;
 
-    @Column(name = "USER_EMAIL", nullable = false)
+    @Column(name = "USER_EMAIL", nullable = false, unique = true)
     private String email;
 
-    @Column(name = "USER_PICTURE", nullable = false)
+    @Column(name = "USER_PASSWORD")
+    private String password;
+
+    @Column(name = "USER_PICTURE")
     private String pictureUrl;
 
     @Enumerated(EnumType.STRING)
@@ -44,32 +48,31 @@ public class User {
     @Column(name = "USER_PROVIDER")
     private Provider provider;
 
-    @Column(name = "USER_ACCESS_TOKEN")
-    private String accessToken;
-
-    @Column(name = "USER_REFRESH_TOKEN")
-    private String refreshToken;
-
-    @Builder
-    public User(String name, String email, String password, String pictureUrl, Role role, Provider provider, String accessToken, String refreshToken) {
-        this.name = name;
-        this.email = email;
-        this.pictureUrl = pictureUrl;
-        this.role = role;
-        this.provider = provider;
-        this.accessToken = accessToken;
-        this.refreshToken = refreshToken;
-    }
-
-    public void saveAccessToken(String accessToken) {
-        this.accessToken = accessToken;
-    }
-    public void saveRefreshToken(String refreshToken) {
-        this.refreshToken = refreshToken;
-    }
+    @Column(name = "USER_PROVIDER_ID")
+    private String providerId;
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     private List<TodoList> todos = new ArrayList<>();
 
+    @Builder
+    public User(String name,
+                String email,
+                String password,
+                String pictureUrl,
+                Role role,
+                Provider provider,
+                String providerId) {
 
+        this.name = name;
+        this.email = email;
+        this.password = password;
+        this.pictureUrl = pictureUrl;
+        this.role = role;
+        this.provider = provider;
+        this.providerId = providerId;
+    }
+
+    public void changePassword(String password) {
+        this.password = password;
+    }
 }

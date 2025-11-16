@@ -1,7 +1,7 @@
 package com.gdg.todolist.controller;
 
 import com.gdg.todolist.dto.LocalUserInfoDto;
-import com.gdg.todolist.dto.LocalUserSignUpDto;
+import com.gdg.todolist.dto.LocalSignupRequestDto;
 import com.gdg.todolist.dto.TokenDto;
 import com.gdg.todolist.service.LocalAuthService;
 import lombok.RequiredArgsConstructor;
@@ -25,13 +25,13 @@ public class LocalSignUpController {
     private final LocalAuthService localAuthService;
 
     @PostMapping("/sign/admin")
-    public ResponseEntity<TokenDto> adminSignUp(@RequestBody LocalUserSignUpDto localUserSignUpDto) {
-        return ResponseEntity.status(HttpStatus.OK).body(localAuthService.adminSignUp(localUserSignUpDto));
+    public ResponseEntity<TokenDto> adminSignUp(@RequestBody LocalSignupRequestDto localSignupRequestDto) {
+        return ResponseEntity.status(HttpStatus.OK).body(localAuthService.adminSignUp(localSignupRequestDto));
     }
 
     @PostMapping("/sign/user")
-    public ResponseEntity<TokenDto> signUp(@RequestBody LocalUserSignUpDto localUserSignUpDto) {
-        return ResponseEntity.status(HttpStatus.OK).body(localAuthService.userSignUp(localUserSignUpDto));
+    public ResponseEntity<TokenDto> signUp(@RequestBody LocalSignupRequestDto localSignupRequestDto) {
+        return ResponseEntity.status(HttpStatus.OK).body(localAuthService.userSignUp(localSignupRequestDto));
     }
 
     @GetMapping("/info")
@@ -45,8 +45,8 @@ public class LocalSignUpController {
     }
 
     @PatchMapping("/update/{id}")
-    public ResponseEntity<LocalUserInfoDto> updateInfo(@PathVariable Long id, @RequestBody LocalUserSignUpDto localUserSignUpDto) {
-        return ResponseEntity.ok(localAuthService.update(id, localUserSignUpDto));
+    public ResponseEntity<LocalUserInfoDto> updateInfo(@PathVariable Long id, @RequestBody LocalSignupRequestDto localSignupRequestDto) {
+        return ResponseEntity.ok(localAuthService.update(id, localSignupRequestDto));
     }
 
     @DeleteMapping("/delete")

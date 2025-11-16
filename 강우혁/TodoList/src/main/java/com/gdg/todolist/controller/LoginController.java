@@ -1,6 +1,6 @@
 package com.gdg.todolist.controller;
 
-import com.gdg.todolist.dto.LoginDto;
+import com.gdg.todolist.dto.LocalLoginRequestDto;
 import com.gdg.todolist.dto.TokenDto;
 import com.gdg.todolist.service.LoginService;
 import lombok.RequiredArgsConstructor;
@@ -18,7 +18,7 @@ public class LoginController {
     private final LoginService loginService;
 
     @PostMapping("/login")
-    public ResponseEntity<TokenDto> login(@RequestBody LoginDto loginRequest) {
+    public ResponseEntity<TokenDto> login(@RequestBody LocalLoginRequestDto loginRequest) {
         return ResponseEntity.status(HttpStatus.OK).body(loginService.login(loginRequest));
     }
 }

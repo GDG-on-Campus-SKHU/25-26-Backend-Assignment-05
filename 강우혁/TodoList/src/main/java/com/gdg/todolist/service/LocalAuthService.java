@@ -5,7 +5,7 @@ import com.gdg.todolist.domain.Provider;
 import com.gdg.todolist.domain.Role;
 import com.gdg.todolist.dto.LocalUserInfoDto;
 import com.gdg.todolist.dto.TokenDto;
-import com.gdg.todolist.dto.LocalUserSignUpDto;
+import com.gdg.todolist.dto.LocalSignupRequestDto;
 import com.gdg.todolist.exception.UserNotFoundException;
 import com.gdg.todolist.jwt.TokenProvider;
 import com.gdg.todolist.repository.LocalUserRepository;
@@ -25,11 +25,11 @@ public class LocalAuthService {
     private final PasswordEncoder passwordEncoder;
 
     @Transactional
-    public TokenDto adminSignUp(LocalUserSignUpDto localUserSignUpDto) {
+    public TokenDto adminSignUp(LocalSignupRequestDto localSignupRequestDto) {
         LocalUser localUser = localUserRepository.save(LocalUser.builder()
-                .name(localUserSignUpDto.getName())
-                .email(localUserSignUpDto.getEmail())
-                .password(passwordEncoder.encode(localUserSignUpDto.getPassword()))
+                .name(localSignupRequestDto.getName())
+                .email(localSignupRequestDto.getEmail())
+                .password(passwordEncoder.encode(localSignupRequestDto.getPassword()))
                 .role(Role.ROLE_ADMIN)
                 .provider(Provider.LOCAL)
                 .build()
@@ -48,11 +48,11 @@ public class LocalAuthService {
     }
 
     @Transactional
-    public TokenDto userSignUp(LocalUserSignUpDto localUserSignUpDto) {
+    public TokenDto userSignUp(LocalSignupRequestDto localSignupRequestDto) {
         LocalUser localUser = localUserRepository.save(LocalUser.builder()
-                .name(localUserSignUpDto.getName())
-                .email(localUserSignUpDto.getEmail())
-                .password(passwordEncoder.encode(localUserSignUpDto.getPassword()))
+                .name(localSignupRequestDto.getName())
+                .email(localSignupRequestDto.getEmail())
+                .password(passwordEncoder.encode(localSignupRequestDto.getPassword()))
                 .role(Role.ROLE_USER)
                 .provider(Provider.LOCAL)
                 .build()
@@ -85,13 +85,13 @@ public class LocalAuthService {
     }
 
     @Transactional
-    public LocalUserInfoDto update(Long id, LocalUserSignUpDto localUserSignUpDto) {
+    public LocalUserInfoDto update(Long id, LocalSignupRequestDto localSignupRequestDto) {
         LocalUser localUser = entityUserId(id);
 
         localUser.updateInfo(
-                localUserSignUpDto.getName(),
-                localUserSignUpDto.getEmail(),
-                localUserSignUpDto.getPassword()
+                localSignupRequestDto.getName(),
+                localSignupRequestDto.getEmail(),
+                localSignupRequestDto.getPassword()
         );
 
         localUserRepository.save(localUser);

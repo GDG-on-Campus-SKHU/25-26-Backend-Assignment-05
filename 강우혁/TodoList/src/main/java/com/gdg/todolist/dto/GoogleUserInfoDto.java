@@ -8,7 +8,7 @@ import lombok.NoArgsConstructor;
 
 @Getter
 @NoArgsConstructor
-public class UserInfoDto {
+public class GoogleUserInfoDto {
     @SerializedName("sub")
     private String id;
     private String email;
@@ -30,7 +30,7 @@ public class UserInfoDto {
     private String locale;
 
     @Builder
-    public UserInfoDto(String id, String email, Boolean verifiedEmail, String name, String givenName, String familyName, String pictureUrl, String locale) {
+    public GoogleUserInfoDto(String id, String email, Boolean verifiedEmail, String name, String givenName, String familyName, String pictureUrl, String locale) {
         this.id = id;
         this.email = email;
         this.verifiedEmail = verifiedEmail;
@@ -41,8 +41,8 @@ public class UserInfoDto {
         this.locale = locale;
     }
 
-    public static UserInfoDto from(User user) {
-        return UserInfoDto.builder()
+    public static GoogleUserInfoDto from(User user) {
+        return GoogleUserInfoDto.builder()
                 .id(user.getId().toString())
                 .email(user.getEmail())
                 .name(user.getName())
