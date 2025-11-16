@@ -39,13 +39,8 @@ public class SecurityConfig {
                                 "/api/**",
                                 "/auth/**"
                                 ,"/", "/index.html"
-                                ,"/google/**"
-                                ,"/login/**", "oauth/**"
-                                ,"/error", "favicon.ico"
-                                ,"/static/**", "/assets/**"
-                                ,"todo/**"
                         ).permitAll()
-                        .requestMatchers("/todo/**").authenticated()
+                        .requestMatchers("/apt/todo/**").authenticated()
                         .anyRequest().authenticated()
                 )
                 .cors(cors -> cors.configurationSource(configurationSource()))

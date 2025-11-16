@@ -8,4 +8,5 @@ import java.util.List;
 
 public interface TodoListRepository extends JpaRepository<TodoList, Long> {
     List<TodoList> findByUser(User user);
+    List<TodoList> findByUserAndTitleContainingIgnoreCase(User user, String title);
 }

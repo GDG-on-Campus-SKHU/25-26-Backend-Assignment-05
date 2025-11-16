@@ -10,12 +10,12 @@ import org.springframework.web.bind.annotation.RestController;
 import java.security.Principal;
 
 @RestController
-@RequestMapping("/google")
+@RequestMapping("/api/login")
 @RequiredArgsConstructor
 public class GoogleTestController {
     private final GoogleLoginService googleLoginService;
 
-    @GetMapping("/login")
+    @GetMapping("/google")
     public User login(Principal principal) {
         return googleLoginService.googleLogin(principal);
     }
